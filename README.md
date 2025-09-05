@@ -57,7 +57,7 @@ A modern, intuitive Flutter application designed to help you track daily expense
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/your-username/my_budget.git
+   git clone https://github.com/faribasra6/my_budget.git
    cd my_budget
    ```
 
