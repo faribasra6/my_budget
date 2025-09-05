@@ -355,7 +355,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   createdAt: currentBudget!.createdAt,
                 );
                 await DatabaseService.updateBudget(updatedBudget);
-                if (mounted) {
+                if (context.mounted) {
                   Navigator.pop(context);
                   _loadData();
                 }

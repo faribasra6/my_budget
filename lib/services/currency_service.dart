@@ -18,6 +18,8 @@ class CurrencyService {
     Currency(code: 'GBP', symbol: '£', name: 'British Pound'),
     Currency(code: 'SAR', symbol: 'ر.س', name: 'Saudi Riyal'),
     Currency(code: 'QAR', symbol: 'ر.ق', name: 'Qatari Riyal'),
+    Currency(code: 'PKR', symbol: '₨', name: 'Pakistani Rupee'),
+    Currency(code: 'INR', symbol: '₹', name: 'Indian Rupee'),
   ];
 
   static Currency _selectedCurrency = _currencies[0]; // Default to AED
