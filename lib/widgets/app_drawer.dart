@@ -4,6 +4,7 @@ import '../screens/monthly_overview_screen.dart';
 import '../screens/statistics_screen.dart';
 import '../screens/currency_selector_screen.dart';
 import '../screens/add_expense_screen.dart';
+import '../screens/category_management_screen.dart';
 import '../services/currency_service.dart';
 
 class AppDrawer extends StatelessWidget {
@@ -59,7 +60,7 @@ class AppDrawer extends StatelessWidget {
                       icon: Icons.category,
                       title: 'Categories',
                       route: '/categories',
-                      onTap: () => _showComingSoon(context, 'Categories Management'),
+                      onTap: () => _navigateTo(context, const CategoryManagementScreen()),
                     ),
                   ],
                 ),
