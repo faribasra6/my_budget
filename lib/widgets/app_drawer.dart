@@ -287,13 +287,8 @@ class AppDrawer extends StatelessWidget {
   void _navigateTo(BuildContext context, Widget screen) {
     Navigator.pop(context); // Close drawer
     
-    // Check if we're already on this screen to avoid unnecessary navigation
-    final currentModalRoute = ModalRoute.of(context);
-    if (currentModalRoute?.settings.name == screen.runtimeType.toString()) {
-      return;
-    }
-    
-    Navigator.pushReplacement(
+    // Use regular push for better navigation stack management
+    Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => screen),
     );
