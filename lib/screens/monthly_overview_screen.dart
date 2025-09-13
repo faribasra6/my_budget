@@ -5,6 +5,7 @@ import '../services/currency_service.dart';
 import '../models/expense.dart';
 import '../models/budget.dart';
 import 'edit_expense_screen.dart';
+import '../widgets/app_drawer.dart';
 
 class MonthlyOverviewScreen extends StatefulWidget {
   const MonthlyOverviewScreen({super.key});
@@ -78,30 +79,55 @@ class _MonthlyOverviewScreenState extends State<MonthlyOverviewScreen> {
     }
 
     return Scaffold(
+      drawer: const AppDrawer(currentRoute: '/monthly'),
       appBar: AppBar(
-        title: GestureDetector(
-          onTap: _showMonthPicker,
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text('${DateFormat('MMMM yyyy').format(selectedDate)} Overview'),
-              const SizedBox(width: 4),
-              const Icon(Icons.keyboard_arrow_down, size: 20),
-            ],
+        title: const Text('Monthly Overview'),
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(56),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.chevron_left),
+                  onPressed: _previousMonth,
+                  tooltip: 'Previous Month',
+                ),
+                Expanded(
+                  child: GestureDetector(
+                    onTap: _showMonthPicker,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey[300]!),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            DateFormat('MMMM yyyy').format(selectedDate),
+                            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          const Icon(Icons.calendar_today, size: 18),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.chevron_right),
+                  onPressed: _nextMonth,
+                  tooltip: 'Next Month',
+                ),
+              ],
+            ),
           ),
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.chevron_left),
-            onPressed: _previousMonth,
-            tooltip: 'Previous Month',
-          ),
-          IconButton(
-            icon: const Icon(Icons.chevron_right),
-            onPressed: _nextMonth,
-            tooltip: 'Next Month',
-          ),
-        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),

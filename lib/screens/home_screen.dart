@@ -7,9 +7,8 @@ import '../models/expense.dart';
 import 'budget_setup_screen.dart';
 import 'add_expense_screen.dart';
 import 'monthly_overview_screen.dart';
-import 'currency_selector_screen.dart';
 import 'edit_expense_screen.dart';
-import 'statistics_screen.dart';
+import '../widgets/app_drawer.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -60,36 +59,14 @@ class _HomeScreenState extends State<HomeScreen> {
     final progressPercentage = totalExpenses / currentBudget!.budgetAmount;
 
     return Scaffold(
+      drawer: const AppDrawer(currentRoute: '/'),
       appBar: AppBar(
         title: const Text('MyBudget'),
         actions: [
           IconButton(
-            icon: const Icon(Icons.analytics),
-            tooltip: 'Statistics',
-            onPressed: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const StatisticsScreen()),
-            ),
-          ),
-          IconButton(
-            icon: const Icon(Icons.currency_exchange),
-            tooltip: 'Change Currency',
-            onPressed: () async {
-              final result = await Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const CurrencySelectorScreen()),
-              );
-              if (result == true && mounted) {
-                setState(() {}); // Refresh to show new currency
-              }
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.bar_chart),
-            onPressed: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const MonthlyOverviewScreen()),
-            ),
+            icon: const Icon(Icons.refresh),
+            tooltip: 'Refresh',
+            onPressed: _loadData,
           ),
         ],
       ),
