@@ -9,6 +9,7 @@ import 'add_expense_screen.dart';
 import 'monthly_overview_screen.dart';
 import 'currency_selector_screen.dart';
 import 'edit_expense_screen.dart';
+import 'statistics_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -62,6 +63,14 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         title: const Text('MyBudget'),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.analytics),
+            tooltip: 'Statistics',
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const StatisticsScreen()),
+            ),
+          ),
           IconButton(
             icon: const Icon(Icons.currency_exchange),
             tooltip: 'Change Currency',

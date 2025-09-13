@@ -21,6 +21,7 @@ class _MonthlyOverviewScreenState extends State<MonthlyOverviewScreen> {
   double avgDaily = 0.0;
   double predictedMonthly = 0.0;
   bool isLoading = true;
+  DateTime selectedDate = DateTime.now();
 
   @override
   void initState() {
@@ -31,10 +32,10 @@ class _MonthlyOverviewScreenState extends State<MonthlyOverviewScreen> {
   Future<void> _loadData() async {
     setState(() => isLoading = true);
     
-    final currentMonth = DateFormat('yyyy-MM').format(DateTime.now());
+    final selectedMonth = DateFormat('yyyy-MM').format(selectedDate);
     
-    expenses = await DatabaseService.getExpensesForMonth(currentMonth);
-    currentBudget = await DatabaseService.getBudgetForMonth(currentMonth);
+    expenses = await DatabaseService.getExpensesForMonth(selectedMonth);
+    currentBudget = await DatabaseService.getBudgetForMonth(selectedMonth);
     
     _calculateStats();
     
@@ -51,11 +52,21 @@ class _MonthlyOverviewScreenState extends State<MonthlyOverviewScreen> {
     }
     
     final now = DateTime.now();
-    final daysInMonth = DateTime(now.year, now.month + 1, 0).day;
-    final daysPassed = now.day;
+    final isCurrentMonth = selectedDate.year == now.year && selectedDate.month == now.month;
     
-    avgDaily = daysPassed > 0 ? totalSpent / daysPassed : 0;
-    predictedMonthly = avgDaily * daysInMonth;
+    if (isCurrentMonth) {
+      // Current month - show prediction
+      final daysInMonth = DateTime(selectedDate.year, selectedDate.month + 1, 0).day;
+      final daysPassed = now.day;
+      
+      avgDaily = daysPassed > 0 ? totalSpent / daysPassed : 0;
+      predictedMonthly = avgDaily * daysInMonth;
+    } else {
+      // Historical month - show actual totals
+      final daysInMonth = DateTime(selectedDate.year, selectedDate.month + 1, 0).day;
+      avgDaily = daysInMonth > 0 ? totalSpent / daysInMonth : 0;
+      predictedMonthly = totalSpent; // Already completed month
+    }
   }
 
   @override
@@ -68,7 +79,29 @@ class _MonthlyOverviewScreenState extends State<MonthlyOverviewScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('${DateFormat('MMMM yyyy').format(DateTime.now())} Overview'),
+        title: GestureDetector(
+          onTap: _showMonthPicker,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text('${DateFormat('MMMM yyyy').format(selectedDate)} Overview'),
+              const SizedBox(width: 4),
+              const Icon(Icons.keyboard_arrow_down, size: 20),
+            ],
+          ),
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.chevron_left),
+            onPressed: _previousMonth,
+            tooltip: 'Previous Month',
+          ),
+          IconButton(
+            icon: const Icon(Icons.chevron_right),
+            onPressed: _nextMonth,
+            tooltip: 'Next Month',
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -136,9 +169,10 @@ class _MonthlyOverviewScreenState extends State<MonthlyOverviewScreen> {
   }
 
   Widget _buildPredictionCard() {
-    final currentMonth = DateTime.now();
-    final daysInMonth = DateTime(currentMonth.year, currentMonth.month + 1, 0).day;
-    final daysRemaining = daysInMonth - currentMonth.day;
+    final now = DateTime.now();
+    final isCurrentMonth = selectedDate.year == now.year && selectedDate.month == now.month;
+    final daysInMonth = DateTime(selectedDate.year, selectedDate.month + 1, 0).day;
+    final daysRemaining = isCurrentMonth ? daysInMonth - now.day : 0;
     
     return Card(
       child: Padding(
@@ -147,7 +181,7 @@ class _MonthlyOverviewScreenState extends State<MonthlyOverviewScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Spending Prediction',
+              isCurrentMonth ? 'Spending Prediction' : 'Monthly Summary',
               style: Theme.of(context).textTheme.titleLarge,
             ),
             const SizedBox(height: 16),
@@ -157,11 +191,19 @@ class _MonthlyOverviewScreenState extends State<MonthlyOverviewScreen> {
                   child: _buildStatItem('Daily Average', CurrencyService.formatAmount(avgDaily)),
                 ),
                 Expanded(
-                  child: _buildStatItem('Predicted Total', CurrencyService.formatAmount(predictedMonthly)),
+                  child: _buildStatItem(
+                    isCurrentMonth ? 'Predicted Total' : 'Month Total', 
+                    CurrencyService.formatAmount(predictedMonthly)
+                  ),
                 ),
-                Expanded(
-                  child: _buildStatItem('Days Left', daysRemaining.toString()),
-                ),
+                if (isCurrentMonth)
+                  Expanded(
+                    child: _buildStatItem('Days Left', daysRemaining.toString()),
+                  )
+                else
+                  Expanded(
+                    child: _buildStatItem('Days in Month', daysInMonth.toString()),
+                  ),
               ],
             ),
             if (currentBudget != null) ...[
@@ -187,9 +229,13 @@ class _MonthlyOverviewScreenState extends State<MonthlyOverviewScreen> {
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        predictedMonthly > currentBudget!.budgetAmount
-                            ? 'You may exceed your budget by ${CurrencyService.formatAmount(predictedMonthly - currentBudget!.budgetAmount)}'
-                            : 'You\'re on track to stay within budget!',
+                        isCurrentMonth 
+                            ? (predictedMonthly > currentBudget!.budgetAmount
+                                ? 'You may exceed your budget by ${CurrencyService.formatAmount(predictedMonthly - currentBudget!.budgetAmount)}'
+                                : 'You\'re on track to stay within budget!')
+                            : (totalSpent > currentBudget!.budgetAmount
+                                ? 'Budget exceeded by ${CurrencyService.formatAmount(totalSpent - currentBudget!.budgetAmount)}'
+                                : 'Stayed within budget! ${CurrencyService.formatAmount(currentBudget!.budgetAmount - totalSpent)} left unused'),
                         style: TextStyle(
                           color: predictedMonthly > currentBudget!.budgetAmount 
                               ? Colors.red[700] 
@@ -388,6 +434,49 @@ class _MonthlyOverviewScreenState extends State<MonthlyOverviewScreen> {
     
     if (result == true) {
       _loadData(); // Refresh data if expense was updated or deleted
+    }
+  }
+
+  void _previousMonth() {
+    setState(() {
+      selectedDate = DateTime(selectedDate.year, selectedDate.month - 1);
+    });
+    _loadData();
+  }
+
+  void _nextMonth() {
+    final now = DateTime.now();
+    final nextMonth = DateTime(selectedDate.year, selectedDate.month + 1);
+    
+    // Don't go beyond current month
+    if (nextMonth.isBefore(DateTime(now.year, now.month + 1))) {
+      setState(() {
+        selectedDate = nextMonth;
+      });
+      _loadData();
+    }
+  }
+
+  Future<void> _showMonthPicker() async {
+    final now = DateTime.now();
+    final firstDate = DateTime(2020, 1); // Allow going back to 2020
+    final lastDate = now;
+
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: selectedDate,
+      firstDate: firstDate,
+      lastDate: lastDate,
+      initialDatePickerMode: DatePickerMode.year,
+      helpText: 'Select Month and Year',
+      fieldLabelText: 'Month/Year',
+    );
+
+    if (picked != null && picked != selectedDate) {
+      setState(() {
+        selectedDate = DateTime(picked.year, picked.month);
+      });
+      _loadData();
     }
   }
 

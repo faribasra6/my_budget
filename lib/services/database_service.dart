@@ -61,8 +61,21 @@ class DatabaseService {
 
   static Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
     if (oldVersion < 2) {
-      await db.execute('ALTER TABLE budgets ADD COLUMN currency TEXT NOT NULL DEFAULT "USD"');
-      await db.execute('ALTER TABLE expenses ADD COLUMN currency TEXT NOT NULL DEFAULT "USD"');
+      try {
+        // Add currency column to budgets table (nullable first, then update)
+        await db.execute('ALTER TABLE budgets ADD COLUMN currency TEXT');
+        await db.execute('UPDATE budgets SET currency = "USD" WHERE currency IS NULL');
+        
+        // Add currency column to expenses table (nullable first, then update)
+        await db.execute('ALTER TABLE expenses ADD COLUMN currency TEXT');
+        await db.execute('UPDATE expenses SET currency = "USD" WHERE currency IS NULL');
+        
+        print('Database migration from version $oldVersion to $newVersion completed successfully');
+      } catch (e) {
+        print('Database migration failed: $e');
+        // In case of migration failure, we could implement recovery logic here
+        rethrow;
+      }
     }
   }
 
@@ -155,6 +168,92 @@ class DatabaseService {
       ['$month%'],
     );
     return (result.first['total'] as double?) ?? 0.0;
+  }
+
+  static Future<double> getWeeklyAverage() async {
+    final db = await database;
+    final now = DateTime.now();
+    final fourWeeksAgo = now.subtract(const Duration(days: 28));
+    
+    final result = await db.rawQuery(
+      'SELECT SUM(amount) as total FROM expenses WHERE date >= ? AND date <= ?',
+      [fourWeeksAgo.toIso8601String().split('T')[0], now.toIso8601String().split('T')[0]],
+    );
+    
+    final total = (result.first['total'] as double?) ?? 0.0;
+    return total / 4; // 4 weeks
+  }
+
+  static Future<double> getCurrentWeekExpenses() async {
+    final db = await database;
+    final now = DateTime.now();
+    final startOfWeek = now.subtract(Duration(days: now.weekday - 1)); // Monday
+    
+    final result = await db.rawQuery(
+      'SELECT SUM(amount) as total FROM expenses WHERE date >= ? AND date <= ?',
+      [startOfWeek.toIso8601String().split('T')[0], now.toIso8601String().split('T')[0]],
+    );
+    
+    return (result.first['total'] as double?) ?? 0.0;
+  }
+
+  static Future<List<Map<String, dynamic>>> getTopSpendingCategories({int limit = 5}) async {
+    final db = await database;
+    final now = DateTime.now();
+    final startOfMonth = DateTime(now.year, now.month, 1);
+    
+    final result = await db.rawQuery(
+      '''
+      SELECT category, SUM(amount) as total, COUNT(*) as count 
+      FROM expenses 
+      WHERE date >= ? 
+      GROUP BY category 
+      ORDER BY total DESC 
+      LIMIT ?
+      ''',
+      [startOfMonth.toIso8601String().split('T')[0], limit],
+    );
+    
+    return result;
+  }
+
+  static Future<double> getDailyAverage({int days = 30}) async {
+    final db = await database;
+    final now = DateTime.now();
+    final startDate = now.subtract(Duration(days: days));
+    
+    final result = await db.rawQuery(
+      'SELECT SUM(amount) as total FROM expenses WHERE date >= ? AND date <= ?',
+      [startDate.toIso8601String().split('T')[0], now.toIso8601String().split('T')[0]],
+    );
+    
+    final total = (result.first['total'] as double?) ?? 0.0;
+    return total / days;
+  }
+
+  static Future<Map<String, double>> getMonthlyComparison() async {
+    final db = await database;
+    final now = DateTime.now();
+    final currentMonth = DateTime(now.year, now.month, 1);
+    final lastMonth = DateTime(now.year, now.month - 1, 1);
+    
+    // Current month total
+    final currentResult = await db.rawQuery(
+      'SELECT SUM(amount) as total FROM expenses WHERE date >= ? AND date < ?',
+      [currentMonth.toIso8601String().split('T')[0], 
+       DateTime(now.year, now.month + 1, 1).toIso8601String().split('T')[0]],
+    );
+    
+    // Last month total
+    final lastResult = await db.rawQuery(
+      'SELECT SUM(amount) as total FROM expenses WHERE date >= ? AND date < ?',
+      [lastMonth.toIso8601String().split('T')[0], currentMonth.toIso8601String().split('T')[0]],
+    );
+    
+    return {
+      'currentMonth': (currentResult.first['total'] as double?) ?? 0.0,
+      'lastMonth': (lastResult.first['total'] as double?) ?? 0.0,
+    };
   }
 
   static Future<int> updateExpense(Expense expense) async {
