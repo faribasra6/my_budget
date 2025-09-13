@@ -8,6 +8,7 @@ import 'budget_setup_screen.dart';
 import 'add_expense_screen.dart';
 import 'monthly_overview_screen.dart';
 import 'currency_selector_screen.dart';
+import 'edit_expense_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -282,10 +283,18 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     title: Text(expense.description),
                     subtitle: Text('${expense.category} • ${DateFormat('MMM dd').format(expense.date)}'),
-                    trailing: Text(
-                      CurrencyService.formatAmount(expense.amount),
-                      style: Theme.of(context).textTheme.titleMedium,
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          CurrencyService.formatAmount(expense.amount),
+                          style: Theme.of(context).textTheme.titleMedium,
+                        ),
+                        const SizedBox(width: 8),
+                        Icon(Icons.edit, size: 16, color: Colors.grey[600]),
+                      ],
                     ),
+                    onTap: () => _navigateToEditExpense(expense),
                   ),
                 )).toList(),
               ),
@@ -320,6 +329,19 @@ class _HomeScreenState extends State<HomeScreen> {
       MaterialPageRoute(builder: (context) => const AddExpenseScreen()),
     );
     _loadData();
+  }
+
+  Future<void> _navigateToEditExpense(Expense expense) async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => EditExpenseScreen(expense: expense),
+      ),
+    );
+    
+    if (result == true) {
+      _loadData(); // Refresh data if expense was updated or deleted
+    }
   }
 
   Future<void> _showSetBudgetDialog() async {

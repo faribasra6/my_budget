@@ -157,6 +157,16 @@ class DatabaseService {
     return (result.first['total'] as double?) ?? 0.0;
   }
 
+  static Future<int> updateExpense(Expense expense) async {
+    final db = await database;
+    return await db.update(
+      'expenses',
+      expense.toMap(),
+      where: 'id = ?',
+      whereArgs: [expense.id],
+    );
+  }
+
   static Future<int> deleteExpense(int id) async {
     final db = await database;
     return await db.delete('expenses', where: 'id = ?', whereArgs: [id]);

@@ -4,6 +4,7 @@ import '../services/database_service.dart';
 import '../services/currency_service.dart';
 import '../models/expense.dart';
 import '../models/budget.dart';
+import 'edit_expense_screen.dart';
 
 class MonthlyOverviewScreen extends StatefulWidget {
   const MonthlyOverviewScreen({super.key});
@@ -334,10 +335,18 @@ class _MonthlyOverviewScreenState extends State<MonthlyOverviewScreen> {
                     ),
                     title: Text(expense.description),
                     subtitle: Text('${expense.category} • ${DateFormat('MMM dd, yyyy').format(expense.date)}'),
-                    trailing: Text(
-                      CurrencyService.formatAmount(expense.amount),
-                      style: Theme.of(context).textTheme.titleMedium,
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          CurrencyService.formatAmount(expense.amount),
+                          style: Theme.of(context).textTheme.titleMedium,
+                        ),
+                        const SizedBox(width: 8),
+                        Icon(Icons.edit, size: 16, color: Colors.grey[600]),
+                      ],
                     ),
+                    onTap: () => _navigateToEditExpense(expense),
                   ),
                 )).toList(),
               ),
@@ -367,6 +376,19 @@ class _MonthlyOverviewScreenState extends State<MonthlyOverviewScreen> {
         ),
       ],
     );
+  }
+
+  Future<void> _navigateToEditExpense(Expense expense) async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => EditExpenseScreen(expense: expense),
+      ),
+    );
+    
+    if (result == true) {
+      _loadData(); // Refresh data if expense was updated or deleted
+    }
   }
 
   IconData _getCategoryIcon(String category) {
