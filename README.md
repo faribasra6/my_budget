@@ -17,15 +17,19 @@ A modern, intuitive Flutter application designed to help you track daily expense
 - Recent expenses overview on home screen
 
 ### 🌍 **Multi-Currency Support**
-- Support for 6 major currencies:
+- Support for 8 major currencies:
   - UAE Dirham (AED) 🇦🇪
   - US Dollar (USD) 🇺🇸
   - Euro (EUR) 🇪🇺
   - British Pound (GBP) 🇬🇧
   - Saudi Riyal (SAR) 🇸🇦
   - Qatari Riyal (QAR) 🇶🇦
+  - Pakistani Rupee (PKR) 🇵🇰
+  - Indian Rupee (INR) 🇮🇳
 - Easy currency switching with symbol display
 - Formatted currency display throughout the app
+- **Currency consistency**: Each expense and budget is stored with its original currency
+- Historical data maintains currency context when switching between currencies
 
 ### 📈 **Smart Analytics**
 - Monthly spending overview and trends

@@ -353,6 +353,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   month: currentBudget!.month,
                   budgetAmount: amount,
                   createdAt: currentBudget!.createdAt,
+                  currency: currentBudget!.currency,
                 );
                 await DatabaseService.updateBudget(updatedBudget);
                 if (context.mounted) {

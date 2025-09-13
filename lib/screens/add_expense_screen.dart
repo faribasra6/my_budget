@@ -223,6 +223,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
         description: _descriptionController.text.trim(),
         date: _selectedDate,
         createdAt: DateTime.now(),
+        currency: CurrencyService.currencyCode,
       );
 
       await DatabaseService.insertExpense(expense);

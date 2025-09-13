@@ -153,6 +153,7 @@ class _BudgetSetupScreenState extends State<BudgetSetupScreen> {
         month: currentMonth,
         budgetAmount: amount,
         createdAt: DateTime.now(),
+        currency: CurrencyService.currencyCode,
       );
 
       await DatabaseService.insertBudget(budget);

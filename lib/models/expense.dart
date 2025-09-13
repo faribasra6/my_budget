@@ -5,6 +5,7 @@ class Expense {
   final String description;
   final DateTime date;
   final DateTime createdAt;
+  final String currency;
 
   Expense({
     this.id,
@@ -13,6 +14,7 @@ class Expense {
     required this.description,
     required this.date,
     required this.createdAt,
+    required this.currency,
   });
 
   Map<String, dynamic> toMap() {
@@ -23,6 +25,7 @@ class Expense {
       'description': description,
       'date': date.toIso8601String().split('T')[0],
       'created_at': createdAt.millisecondsSinceEpoch,
+      'currency': currency,
     };
   }
 
@@ -34,6 +37,7 @@ class Expense {
       description: map['description'],
       date: DateTime.parse(map['date']),
       createdAt: DateTime.fromMillisecondsSinceEpoch(map['created_at']),
+      currency: map['currency'] ?? 'USD',
     );
   }
 }

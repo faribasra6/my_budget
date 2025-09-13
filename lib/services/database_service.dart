@@ -7,7 +7,7 @@ import '../models/category.dart';
 class DatabaseService {
   static Database? _database;
   static const String _databaseName = 'my_budget.db';
-  static const int _databaseVersion = 1;
+  static const int _databaseVersion = 2;
 
   static Future<Database> get database async {
     if (_database != null) return _database!;
@@ -21,6 +21,7 @@ class DatabaseService {
       path,
       version: _databaseVersion,
       onCreate: _onCreate,
+      onUpgrade: _onUpgrade,
     );
   }
 
@@ -30,7 +31,8 @@ class DatabaseService {
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         month TEXT NOT NULL UNIQUE,
         budget_amount REAL NOT NULL,
-        created_at INTEGER NOT NULL
+        created_at INTEGER NOT NULL,
+        currency TEXT NOT NULL DEFAULT 'USD'
       )
     ''');
 
@@ -41,7 +43,8 @@ class DatabaseService {
         category TEXT NOT NULL,
         description TEXT NOT NULL,
         date TEXT NOT NULL,
-        created_at INTEGER NOT NULL
+        created_at INTEGER NOT NULL,
+        currency TEXT NOT NULL DEFAULT 'USD'
       )
     ''');
 
@@ -54,6 +57,13 @@ class DatabaseService {
     ''');
 
     await _insertDefaultCategories(db);
+  }
+
+  static Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
+    if (oldVersion < 2) {
+      await db.execute('ALTER TABLE budgets ADD COLUMN currency TEXT NOT NULL DEFAULT "USD"');
+      await db.execute('ALTER TABLE expenses ADD COLUMN currency TEXT NOT NULL DEFAULT "USD"');
+    }
   }
 
   static Future<void> _insertDefaultCategories(Database db) async {
