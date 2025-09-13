@@ -31,13 +31,19 @@ A modern, intuitive Flutter application designed to help you track daily expense
 - **Currency consistency**: Each expense and budget is stored with its original currency
 - Historical data maintains currency context when switching between currencies
 
-### 📈 **Smart Analytics**
-- Monthly spending overview and trends
-- Daily expense estimates based on usage patterns
-- Category-wise spending breakdown
-- Budget utilization percentages
+### 📈 **Smart Analytics & Statistics**
+- **Statistics Dashboard**: Comprehensive spending insights and trends
+- **Weekly averages**: Track your spending patterns over time
+- **Monthly comparison**: This month vs last month analysis
+- **Top categories**: See where your money goes most
+- **Daily averages**: Understand your daily spending habits
+- **Budget performance**: Track budget vs actual spending
+- Category-wise spending breakdown with visual progress bars
 
 ### 🎨 **Modern UI/UX**
+- **Navigation Drawer**: Professional organized menu system
+- **Month Browser**: Navigate through any historical month/year
+- **Edit Expenses**: Full expense editing with delete functionality  
 - Clean, Material Design 3 interface
 - Intuitive navigation with smooth transitions
 - Dark/light theme support
@@ -45,6 +51,8 @@ A modern, intuitive Flutter application designed to help you track daily expense
 
 ### 💾 **Local Data Storage**
 - SQLite database for fast, offline functionality
+- **Category Management**: Add, edit, delete custom expense categories
+- **Currency Migration**: Safe database updates preserve your data
 - Secure local storage of financial data
 - Data persistence across app sessions
 - No internet required for core functionality
@@ -129,16 +137,26 @@ lib/
 4. **View Analytics**: Navigate to monthly overview for detailed insights
 5. **Manage Budget**: Update your monthly budget as needed
 
+## ✅ **Latest Updates (v1.3.0)**
+
+### 🆕 **New Features Added:**
+- ✅ **Statistics Dashboard** - Comprehensive analytics with weekly averages
+- ✅ **Month Browser** - Navigate through any historical month/year
+- ✅ **Category Management** - Add, edit, delete custom expense categories
+- ✅ **Edit Expenses** - Full expense editing and deletion functionality
+- ✅ **Navigation Drawer** - Professional organized menu system
+- ✅ **Currency Consistency** - Each expense maintains its original currency
+
 ## 🔮 Future Enhancements
 
-- [ ] Cloud backup and sync
-- [ ] Expense categories customization
 - [ ] Export data to CSV/PDF
+- [ ] Cloud backup and sync
 - [ ] Spending goals and targets
 - [ ] Recurring expense templates
-- [ ] Advanced analytics and charts
+- [ ] Advanced charts and visualizations
 - [ ] Multiple budget accounts
 - [ ] Bill reminders and notifications
+- [ ] Budget alerts and spending limits
 
 ## 🤝 Contributing
 
@@ -154,12 +172,22 @@ Contributions are welcome! Please feel free to submit a Pull Request. For major 
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
+## 👨‍💻 Developer
+
+**Farhan Shafaqat**
+- 📧 Email: [farhanshafaqatbasra@gmail.com](mailto:farhanshafaqatbasra@gmail.com)
+- 🌐 Portfolio: [https://farhan-shafaqat-portfolio.vercel.app/](https://farhan-shafaqat-portfolio.vercel.app/)
+- 🐙 GitHub: [@faribasra6](https://github.com/faribasra6)
+
 ## 🙋‍♂️ Support
 
 If you like this project, please consider giving it a ⭐ on GitHub!
 
-For questions or support, please open an issue in the GitHub repository.
+For questions, feature requests, or support:
+- 📧 Contact: [farhanshafaqatbasra@gmail.com](mailto:farhanshafaqatbasra@gmail.com)
+- 🐛 Issues: Open an issue in the GitHub repository
+- 💬 Discussions: Start a discussion for feature ideas
 
 ---
 
-**Made with ❤️ using Flutter**
+**Made with ❤️ using Flutter by [Farhan Shafaqat](https://farhan-shafaqat-portfolio.vercel.app/)**
